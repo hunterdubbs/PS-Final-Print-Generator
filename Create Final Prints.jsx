@@ -1,3 +1,14 @@
+//=================================//
+//*********************************//
+//------Auhtor:  Hunter Dubbs------//
+//*********************************//
+//-This program takes image files--//
+//-resizes them, puts them on an---//
+//-appropriately sized canvas,-----//
+//applies a border, and exports it.//
+//=================================//
+
+
 //set units to inches
 var oldUnitConfig = preferences.rulerUnits;
 preferences.rulerUnits = Units.INCHES;
@@ -71,7 +82,7 @@ function cancelOperation() {
 }
 
 function openFolderBrowser(){
-	runDialog.sizeConfig.destinationInput.text = Folder.selectDialog('Select file destination');
+	runDialog.sizeConfig.destinationInput.text = Folder.selectDialog('Select File Destination');
 }
 
 function openFileBrowser(){
@@ -182,15 +193,15 @@ function createPrints(){
 			if(fileFormat == '.psd'){
 				var psdSaveConfig = new PhotoshopSaveOptions();
 				psdSaveConfig.layers = true;
-				finalImg.saveAs(new File(destination + '/' + images[i].displayName + fileFormat), psdSaveConfig, true, Extension.LOWERCASE);
+				finalImg.saveAs(new File(destination + '/' + images[i].displayName.substr(0, images[i].displayName.lastIndexOf('.')) + '_print' + fileFormat), psdSaveConfig, true, Extension.LOWERCASE);
 			}else if(fileFormat == '.jpg'){
 				var jpgSaveConfig = new JPEGSaveOptions();
 				jpgSaveConfig.quality = 12;
-				finalImg.saveAs(new File(destination + '/' + images[i].displayName + fileFormat), jpgSaveConfig, true, Extension.LOWERCASE);
+				finalImg.saveAs(new File(destination + '/' + images[i].displayName.substr(0, images[i].displayName.lastIndexOf('.')) + '_print' + fileFormat), jpgSaveConfig, true, Extension.LOWERCASE);
 			}else if(fileFormat == '.png'){
 				var pngSaveConfig = new PNGSaveOptions();
 				pngSaveConfig.compression = 0;
-				finalImg.saveAs(new File(destination + '/' + images[i].displayName + fileFormat), pngSaveConfig, true, Extension.LOWERCASE);
+				finalImg.saveAs(new File(destination + '/' + images[i].displayName.substr(0, images[i].displayName.lastIndexOf('.')) + '_print' + fileFormat), pngSaveConfig, true, Extension.LOWERCASE);
 			}
 			//clean up and close images
 			img.close(SaveOptions.DONOTSAVECHANGES);
@@ -198,7 +209,7 @@ function createPrints(){
 			finalImg.close(SaveOptions.DONOTSAVECHANGES);
 		}
 		//notify user that the process has finished
-		alert('Process successful! ' + images.length + ' images were created at ' + destination);
+		alert('Process successful! ' + images.length + ' image(s) were created at ' + destination);
 		//reset global config		
 		displayDialogs = DialogModes.YES;
 		preferences.rulerUnits = oldUnitConfig;
