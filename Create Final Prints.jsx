@@ -23,13 +23,13 @@ var executed;
 //setup window
 var runDialog = new Window('dialog', 'Create Final Prints');
 runDialog.frameLocation = [100, 100];
-runDialog.bounds = [100, 100, 600, 400];
+runDialog.bounds = [100, 100, 600, 430];
 //window components
 runDialog.imageSelection = runDialog.add('panel', [20, 10, 480, 65], 'Image Selection');
 runDialog.imageSelection.selectionLabel = runDialog.imageSelection.add('statictext', [20, 20, 140, 40], 'Select Images');
 runDialog.imageSelection.selectionButton = runDialog.imageSelection.add('button', [155, 20, 210, 40], 'Browse');
 runDialog.imageSelection.selectionSummary = runDialog.imageSelection.add('statictext', [235, 20, 430, 40], 'No Images Selected');
-runDialog.sizeConfig = runDialog.add('panel', [20, 75, 480, 230], 'Image Output Size');
+runDialog.sizeConfig = runDialog.add('panel', [20, 75, 480, 260], 'Image Output Size');
 runDialog.sizeConfig.canvasHeightLabel = runDialog.sizeConfig.add('statictext', [20, 20, 140, 40], 'Canvas Height (Inches)');
 runDialog.sizeConfig.canvasHeightInput = runDialog.sizeConfig.add('edittext', [145, 20, 210, 40], '8.5');
 runDialog.sizeConfig.canvasWidthLabel = runDialog.sizeConfig.add('statictext', [235, 20, 360, 40], 'Canvas Width (Inches)');
@@ -52,7 +52,9 @@ runDialog.sizeConfig.signatureInput = runDialog.sizeConfig.add('edittext', [95, 
 runDialog.sizeConfig.destinationLabel = runDialog.sizeConfig.add('statictext', [150, 110, 240, 130], 'Destination Folder');
 runDialog.sizeConfig.destinationInput = runDialog.sizeConfig.add('edittext', [245, 110, 370, 130], '~/Pictures');
 runDialog.sizeConfig.destinationButton = runDialog.sizeConfig.add('button', [375, 110, 430, 130], 'Browse');
-runDialog.windowButtons = runDialog.add('panel', [20, 240, 480, 285], 'Options');
+runDialog.sizeConfig.titleEnabled = runDialog.sizeConfig.add('checkbox', [20, 140, 40, 160]);
+runDialog.sizeConfig.titleLabel = runDialog.sizeConfig.add('statictext', [50, 140, 200, 160], 'Use File Name as Print Title');
+runDialog.windowButtons = runDialog.add('panel', [20, 270, 480, 315], 'Options');
 runDialog.windowButtons.okButton = runDialog.windowButtons.add('button', [250, 5, 350, 25], 'OK');
 runDialog.windowButtons.cancelButton = runDialog.windowButtons.add('button', [350, 5, 450, 25], 'Cancel');
 runDialog.windowButtons.outputFormatLabel = runDialog.windowButtons.add('statictext', [20, 5, 95, 25], 'Output Format');
@@ -128,6 +130,7 @@ function setConfig(){
 	resolution = runDialog.sizeConfig.imageResolutionInput.text;
 	destination = runDialog.sizeConfig.destinationInput.text;
 	signature = runDialog.sizeConfig.signatureInput.text;
+	titles = runDialog.sizeConfig.titleEnabled.value;
 	switch (runDialog.windowButtons.outputFormatInput.selection.index){
 		case 0:
 			fileFormat = '.jpg';
@@ -176,6 +179,18 @@ function createPrints(){
 			app.activeDocument = finalImg;
 			//center the image
 			finalImg.activeLayer.translate(new UnitValue((canvasWidth - imageWidth) / 2, 'inches'), new UnitValue((canvasHeight - imageHeight) / 2, 'inches'));
+			//put image title in bottom left if enabled
+			if(titles){
+				var titleLayer = finalImg.artLayers.add();
+				titleLayer.kind = LayerKind.TEXT;
+				titleLayer.textItem.contents = images[i].displayName.substr(0, images[i].displayName.indexOf('.'));
+				titleLayer.textItem.fauxBold = true;
+				titleLayer.textItem.size = new UnitValue(14, 'pt');
+				var textPos = titleLayer.bounds;
+				textPos[0] = (canvasWidth - imageWidth) / 2 - textPos[0];
+				textPos[1] = (canvasHeight - (canvasHeight - imageHeight) / 2) - textPos[1] - 0.1;
+				titleLayer.translate(new UnitValue(-textPos[0], 'inches'), new UnitValue(-textPos[1], 'inches'));
+			}
 			//put signature in bottom right
 			var signatureLayer = finalImg.artLayers.add();
 			signatureLayer.kind = LayerKind.TEXT;
